@@ -393,27 +393,24 @@ class CurveControlDemo {
         const prices = this.generateSamplePrices(intervals.length);
         const optimizedTemps = result.bestTempActual || [];
 
-        // Convert intervals to time labels
-        const timeLabels = intervals.map((_, index) => {
-            const hour = Math.floor(index / 2);
-            const minute = (index % 2) * 30;
-            return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        });
+        // Create standard 24-hour time labels (every 30 minutes)
+        const timeLabels = [];
+        for (let hour = 0; hour < 24; hour++) {
+            timeLabels.push(`${hour.toString().padStart(2, '0')}:00`);
+            timeLabels.push(`${hour.toString().padStart(2, '0')}:30`);
+        }
 
-        // Find min/max for temperature axis
-        const allTemps = [...optimizedTemps, ...highBounds, ...lowBounds];
-        const minTemp = Math.floor(Math.min(...allTemps) - 2);
-        const maxTemp = Math.ceil(Math.max(...allTemps) + 2);
-        const maxPrice = Math.ceil(Math.max(...prices) * 1.1 * 100) / 100;
+        // Ensure we have exactly 48 data points for 24 hours
+        const dataLength = 48;
 
         const config = {
             type: 'line',
             data: {
-                labels: timeLabels.filter((_, i) => i % 4 === 0), // Show every 4th label
+                labels: timeLabels.filter((_, i) => i % 4 === 0), // Show every 2 hours (every 4th 30-min interval)
                 datasets: [
                     {
                         label: 'Optimized Temperature',
-                        data: optimizedTemps.filter((_, i) => i % 4 === 0),
+                        data: optimizedTemps.slice(0, dataLength).filter((_, i) => i % 4 === 0),
                         borderColor: '#667eea',
                         backgroundColor: '#667eea',
                         borderWidth: 3,
@@ -422,7 +419,7 @@ class CurveControlDemo {
                     },
                     {
                         label: 'High Limit',
-                        data: highBounds.filter((_, i) => i % 4 === 0),
+                        data: highBounds.slice(0, dataLength).filter((_, i) => i % 4 === 0),
                         borderColor: '#ff6b6b',
                         backgroundColor: '#ff6b6b',
                         borderWidth: 2,
@@ -432,7 +429,7 @@ class CurveControlDemo {
                     },
                     {
                         label: 'Low Limit',
-                        data: lowBounds.filter((_, i) => i % 4 === 0),
+                        data: lowBounds.slice(0, dataLength).filter((_, i) => i % 4 === 0),
                         borderColor: '#4ecdc4',
                         backgroundColor: '#4ecdc4',
                         borderWidth: 2,
@@ -442,7 +439,7 @@ class CurveControlDemo {
                     },
                     {
                         label: 'Electricity Price',
-                        data: prices.filter((_, i) => i % 4 === 0),
+                        data: prices.slice(0, dataLength).filter((_, i) => i % 4 === 0),
                         borderColor: '#feca57',
                         backgroundColor: 'rgba(254, 202, 87, 0.3)',
                         borderWidth: 2,
@@ -458,7 +455,7 @@ class CurveControlDemo {
                     x: {
                         title: {
                             display: true,
-                            text: 'Time of Day'
+                            text: 'Time of Day (24-Hour)'
                         }
                     },
                     y: {
@@ -469,8 +466,8 @@ class CurveControlDemo {
                             display: true,
                             text: 'Temperature (°F)'
                         },
-                        min: minTemp,
-                        max: maxTemp
+                        min: 0,
+                        max: 100
                     },
                     y1: {
                         type: 'linear',
@@ -481,7 +478,7 @@ class CurveControlDemo {
                             text: 'Price ($/kWh)'
                         },
                         min: 0,
-                        max: maxPrice,
+                        max: 1.0,
                         grid: {
                             drawOnChartArea: false,
                         },
