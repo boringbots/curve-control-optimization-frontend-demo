@@ -405,6 +405,11 @@ class CurveControlDemo {
         const prices = this.generateSamplePrices(intervals.length);
         const optimizedTemps = result.bestTempActual || [];
 
+        // Get location for dynamic price scale
+        const locationSelect = document.getElementById('location');
+        const location = locationSelect ? parseInt(locationSelect.value) : 1;
+        const maxPriceScale = location === 8 ? 1.6 : 1.0;
+
         // Create standard 24-hour time labels (every 30 minutes)
         const timeLabels = [];
         for (let hour = 0; hour < 24; hour++) {
@@ -495,7 +500,7 @@ class CurveControlDemo {
                             text: 'Price ($/kWh)'
                         },
                         min: 0,
-                        max: 1.5,
+                        max: maxPriceScale,
                         grid: {
                             drawOnChartArea: false,
                         },
