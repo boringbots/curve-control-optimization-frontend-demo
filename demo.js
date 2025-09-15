@@ -316,8 +316,10 @@ class CurveControlDemo {
         this.enableResultsTab(true);
 
         try {
+            // Add unique timestamp to force fresh calculation
+            data.requestId = Date.now();
             console.log('Sending optimization request:', data);
-            
+
             const response = await fetch(`${this.backendUrl}/generate_schedule`, {
                 method: 'POST',
                 headers: {
@@ -448,6 +450,7 @@ class CurveControlDemo {
                         borderWidth: 2,
                         fill: true,
                         pointRadius: 0,
+                        stepped: true, // Creates flat lines between points (step chart)
                         yAxisID: 'y1'
                     }
                 ]
