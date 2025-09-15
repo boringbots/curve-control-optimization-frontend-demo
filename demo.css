@@ -368,6 +368,8 @@ small {
 /* Chart Container */
 .chart-container {
     margin-bottom: 2rem;
+    height: 450px; /* Fixed height to prevent growing */
+    position: relative;
 }
 
 .chart-container h4 {
@@ -377,7 +379,9 @@ small {
 }
 
 #temperature-chart {
-    min-height: 400px;
+    height: 400px !important; /* Fixed height for canvas */
+    max-height: 400px;
+    width: 100% !important;
 }
 
 /* Call to Action */

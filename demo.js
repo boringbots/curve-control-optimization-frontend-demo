@@ -105,6 +105,21 @@ class CurveControlDemo {
         }
     }
 
+    getDefaultTemperatures(hour) {
+        // 00:00 to 10:00 (0-9): 69-72°F (sleep/early morning)
+        if (hour >= 0 && hour < 10) {
+            return { high: 72, low: 69 };
+        }
+        // 10:00 to 18:00 (10-17): 65-78°F (away/work hours - wider range)
+        else if (hour >= 10 && hour < 18) {
+            return { high: 78, low: 65 };
+        }
+        // 18:00 to 00:00 (18-23): 69-72°F (evening/home time)
+        else {
+            return { high: 72, low: 69 };
+        }
+    }
+
     setupAdvancedSchedule() {
         const container = document.getElementById('hourly-schedule');
         container.innerHTML = '';
@@ -124,13 +139,14 @@ class CurveControlDemo {
             highGroup.className = 'temp-input-group';
             const highLabel = document.createElement('label');
             highLabel.textContent = 'High';
+            const defaults = this.getDefaultTemperatures(hour);
             const highInput = document.createElement('input');
             highInput.type = 'number';
             highInput.min = '60';
             highInput.max = '85';
-            highInput.value = '75';
+            highInput.value = defaults.high.toString();
             highInput.id = `high-${hour}`;
-            
+
             const lowGroup = document.createElement('div');
             lowGroup.className = 'temp-input-group';
             const lowLabel = document.createElement('label');
@@ -139,7 +155,7 @@ class CurveControlDemo {
             lowInput.type = 'number';
             lowInput.min = '60';
             lowInput.max = '85';
-            lowInput.value = '69';
+            lowInput.value = defaults.low.toString();
             lowInput.id = `low-${hour}`;
             
             highGroup.appendChild(highLabel);
@@ -160,10 +176,11 @@ class CurveControlDemo {
         for (let hour = 0; hour < 24; hour++) {
             const highInput = document.getElementById(`high-${hour}`);
             const lowInput = document.getElementById(`low-${hour}`);
-            
+
             if (highInput && lowInput) {
-                highInput.value = '75';
-                lowInput.value = '69';
+                const defaults = this.getDefaultTemperatures(hour);
+                highInput.value = defaults.high.toString();
+                lowInput.value = defaults.low.toString();
             }
         }
     }
