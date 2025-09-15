@@ -200,6 +200,9 @@ class CurveControlDemo {
         const timeHome = document.getElementById('time-home').value;
         const savingsLevel = parseInt(document.querySelector('input[name="savings-level"]:checked').value);
 
+        // Generate basic temperature schedule (like HA integration does)
+        const temperatureSchedule = this.generateBasicTemperatureSchedule(targetTemp, timeAway, timeHome, savingsLevel);
+
         return {
             homeSize,
             homeTemperature: targetTemp,
@@ -207,9 +210,57 @@ class CurveControlDemo {
             timeAway,
             timeHome,
             savingsLevel,
+            temperatureSchedule,
             heatUpRate: 0.5535,  // Default thermal rates
             coolDownRate: 1.9335
         };
+    }
+
+    generateBasicTemperatureSchedule(baseTemp, timeAway, timeHome, savingsLevel) {
+        // Convert times to 30-minute intervals (0-47)
+        const awayInterval = this.timeToInterval(timeAway);
+        const homeInterval = this.timeToInterval(timeHome);
+        
+        // Calculate temperature offsets based on savings level
+        const savingsOffset = this.calculateSavingsOffset(savingsLevel);
+        const deadbandOffset = 1.4; // Same as HA integration DEADBAND_OFFSET
+        
+        const highTemperatures = [];
+        const lowTemperatures = [];
+        
+        for (let interval = 0; interval < 48; interval++) {
+            if (awayInterval <= interval && interval <= homeInterval) {
+                // Away period - allow more temperature variation for savings
+                highTemperatures.push(baseTemp + savingsOffset + deadbandOffset);
+                lowTemperatures.push(baseTemp - savingsOffset - deadbandOffset);
+            } else {
+                // Home period - tighter comfort range
+                highTemperatures.push(baseTemp + deadbandOffset);
+                lowTemperatures.push(baseTemp - deadbandOffset);
+            }
+        }
+        
+        return {
+            highTemperatures,
+            lowTemperatures,
+            intervalMinutes: 30,
+            totalIntervals: 48
+        };
+    }
+
+    timeToInterval(timeStr) {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return (hours * 2) + (minutes >= 30 ? 1 : 0);
+    }
+
+    calculateSavingsOffset(savingsLevel) {
+        // Same logic as HA integration
+        switch (savingsLevel) {
+            case 1: return 2;   // Conservative
+            case 2: return 6;   // Balanced  
+            case 3: return 12;  // Aggressive
+            default: return 6;
+        }
     }
 
     collectAdvancedSettings() {
