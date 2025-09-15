@@ -406,44 +406,48 @@ class CurveControlDemo {
         const config = {
             type: 'line',
             data: {
-                labels: timeLabels.filter((_, i) => i % 4 === 0), // Show every 2 hours (every 4th 30-min interval)
+                labels: [...timeLabels.filter((_, i) => i % 4 === 0), '00:00'], // Show every 2 hours + final 00:00
                 datasets: [
                     {
                         label: 'Optimized Temperature',
-                        data: optimizedTemps.slice(0, dataLength).filter((_, i) => i % 4 === 0),
+                        data: [...optimizedTemps.slice(0, dataLength).filter((_, i) => i % 4 === 0), optimizedTemps[0]],
                         borderColor: '#667eea',
                         backgroundColor: '#667eea',
                         borderWidth: 3,
                         fill: false,
+                        pointRadius: 0,
                         yAxisID: 'y'
                     },
                     {
                         label: 'High Limit',
-                        data: highBounds.slice(0, dataLength).filter((_, i) => i % 4 === 0),
+                        data: [...highBounds.slice(0, dataLength).filter((_, i) => i % 4 === 0), highBounds[0]],
                         borderColor: '#ff6b6b',
                         backgroundColor: '#ff6b6b',
                         borderWidth: 2,
                         borderDash: [5, 5],
                         fill: false,
+                        pointRadius: 0,
                         yAxisID: 'y'
                     },
                     {
                         label: 'Low Limit',
-                        data: lowBounds.slice(0, dataLength).filter((_, i) => i % 4 === 0),
+                        data: [...lowBounds.slice(0, dataLength).filter((_, i) => i % 4 === 0), lowBounds[0]],
                         borderColor: '#4ecdc4',
                         backgroundColor: '#4ecdc4',
                         borderWidth: 2,
                         borderDash: [5, 5],
                         fill: false,
+                        pointRadius: 0,
                         yAxisID: 'y'
                     },
                     {
                         label: 'Electricity Price',
-                        data: prices.slice(0, dataLength).filter((_, i) => i % 4 === 0),
+                        data: [...prices.slice(0, dataLength).filter((_, i) => i % 4 === 0), prices[0]],
                         borderColor: '#feca57',
                         backgroundColor: 'rgba(254, 202, 87, 0.3)',
                         borderWidth: 2,
                         fill: true,
+                        pointRadius: 0,
                         yAxisID: 'y1'
                     }
                 ]
