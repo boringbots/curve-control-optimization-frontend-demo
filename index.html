@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curve Control Energy Optimizer - Try the Demo</title>
+    <link rel="stylesheet" href="demo.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🔥 Curve Control Energy Optimizer</h1>
+            <p class="tagline">See how much you could save on your energy bills with smart HVAC optimization</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Try Our Optimization Engine</h2>
+                <p>Enter your home details below to see your potential energy savings and optimized temperature schedule. No installation required!</p>
+            </div>
+        </section>
+
+        <!-- Demo Form -->
+        <section class="demo-form">
+            <div class="card">
+                <div class="tab-navigation">
+                    <button class="tab active" data-tab="basic">Basic Settings</button>
+                    <button class="tab" data-tab="advanced">Advanced Options</button>
+                    <button class="tab" data-tab="results" id="results-tab" disabled>Results</button>
+                </div>
+
+                <!-- Basic Settings Tab -->
+                <div class="tab-content active" id="basic-tab">
+                    <h3>🏠 Your Home Details</h3>
+                    
+                    <div class="form-group">
+                        <label for="home-size">Home Size (sq ft)</label>
+                        <input type="number" id="home-size" value="2000" min="500" max="10000" step="100">
+                        <small>Typical single-family home is 1,500-3,000 sq ft</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="target-temp">Preferred Temperature (°F)</label>
+                        <input type="number" id="target-temp" value="72" min="60" max="85" step="1">
+                        <small>Your ideal indoor temperature</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Your Utility Rate Plan</label>
+                        <select id="location">
+                            <option value="1">San Diego Gas & Electric TOU-DR1</option>
+                            <option value="2">San Diego Gas & Electric TOU-DR2</option>
+                            <option value="3">San Diego Gas & Electric TOU-DR-P</option>
+                            <option value="4">San Diego Gas & Electric TOU-ELEC</option>
+                            <option value="5">San Diego Gas & Electric Standard DR</option>
+                            <option value="6">New Hampshire TOU Whole House Domestic</option>
+                            <option value="7">Texas XCEL Time-Of-Use</option>
+                        </select>
+                        <small>Choose your electricity provider and rate plan</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="time-away">Away Time</label>
+                            <input type="time" id="time-away" value="08:00">
+                            <small>When you typically leave home</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="time-home">Home Time</label>
+                            <input type="time" id="time-home" value="17:00">
+                            <small>When you typically return home</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="savings-level">Optimization Level</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="savings-level" value="1">
+                                <span class="radio-label">
+                                    <strong>Conservative</strong>
+                                    <small>±2°F temperature adjustment</small>
+                                </span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="savings-level" value="2" checked>
+                                <span class="radio-label">
+                                    <strong>Balanced</strong>
+                                    <small>±6°F temperature adjustment</small>
+                                </span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="savings-level" value="3">
+                                <span class="radio-label">
+                                    <strong>Aggressive</strong>
+                                    <small>±12°F temperature adjustment</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="calculate-basic">See My Optimization Results</button>
+                </div>
+
+                <!-- Advanced Options Tab -->
+                <div class="tab-content" id="advanced-tab">
+                    <h3>🎛️ Custom Hourly Preferences</h3>
+                    <p>Set your preferred temperature ranges for each hour of the day. The optimizer will work within these bounds.</p>
+                    
+                    <div class="schedule-controls">
+                        <button type="button" class="btn-secondary" id="reset-schedule">Reset to Defaults</button>
+                        <button type="button" class="btn-primary" id="calculate-advanced">Optimize Custom Schedule</button>
+                    </div>
+
+                    <div class="schedule-grid" id="hourly-schedule">
+                        <!-- Hourly schedule inputs will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Results Tab -->
+                <div class="tab-content" id="results-tab-content">
+                    <h3>📊 Your Optimization Results</h3>
+                    
+                    <!-- Loading State -->
+                    <div class="loading" id="loading-indicator">
+                        <div class="spinner"></div>
+                        <p>Calculating your optimal schedule...</p>
+                    </div>
+
+                    <!-- Results Content -->
+                    <div class="results-content" id="results-content" style="display: none;">
+                        <!-- Savings Summary -->
+                        <div class="savings-summary">
+                            <div class="savings-card">
+                                <div class="savings-amount" id="cost-savings">$0</div>
+                                <div class="savings-label">Estimated Annual Savings</div>
+                            </div>
+                            <div class="savings-card">
+                                <div class="savings-amount" id="percent-savings">0%</div>
+                                <div class="savings-label">Percentage Reduction</div>
+                            </div>
+                            <div class="savings-card">
+                                <div class="savings-amount" id="co2-savings">0</div>
+                                <div class="savings-label">Tons CO₂ Avoided</div>
+                            </div>
+                        </div>
+
+                        <!-- Temperature Schedule Chart -->
+                        <div class="chart-container">
+                            <h4>Your Optimized Temperature Schedule</h4>
+                            <div id="temperature-chart"></div>
+                        </div>
+
+                        <!-- Call to Action -->
+                        <div class="cta-section">
+                            <h4>Ready to start saving?</h4>
+                            <p>Get the full Home Assistant integration to automatically control your HVAC system and start saving money today.</p>
+                            <div class="cta-buttons">
+                                <a href="https://github.com/boringbots/curve-control-ha-integration" class="btn-primary" target="_blank">
+                                    Get Home Assistant Integration
+                                </a>
+                                <button class="btn-secondary" id="try-another">Try Different Settings</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error State -->
+                    <div class="error-state" id="error-state" style="display: none;">
+                        <h4>⚠️ Unable to Calculate Results</h4>
+                        <p id="error-message">Please check your settings and try again.</p>
+                        <button class="btn-secondary" id="retry-calculation">Retry</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <h3>Why Choose Curve Control?</h3>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <h4>Save Money</h4>
+                    <p>Typically save 10-25% on heating and cooling costs by optimizing for time-of-use rates</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🌱</div>
+                    <h4>Reduce Carbon Footprint</h4>
+                    <p>Lower your environmental impact by shifting energy usage to off-peak hours</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h4>Maintain Comfort</h4>
+                    <p>Smart algorithms ensure your comfort preferences are always respected</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🏠</div>
+                    <h4>Works with Any HVAC</h4>
+                    <p>Compatible with most thermostats through Home Assistant integration</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Curve Control Energy Solutions. Optimize smart, save more.</p>
+        </div>
+    </footer>
+
+    <script src="demo.js"></script>
+</body>
+</html>
