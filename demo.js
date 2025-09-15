@@ -495,7 +495,7 @@ class CurveControlDemo {
                             text: 'Price ($/kWh)'
                         },
                         min: 0,
-                        max: 1.0,
+                        max: 1.5,
                         grid: {
                             drawOnChartArea: false,
                         },
