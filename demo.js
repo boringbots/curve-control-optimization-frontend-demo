@@ -51,6 +51,10 @@ class CurveControlDemo {
             this.retryCalculation();
         });
 
+        document.getElementById('force-refresh').addEventListener('click', () => {
+            this.forceRefresh();
+        });
+
         // Form validation
         this.setupFormValidation();
     }
@@ -324,7 +328,11 @@ class CurveControlDemo {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
                 },
+                cache: 'no-cache',
                 body: JSON.stringify(data)
             });
 
@@ -366,11 +374,13 @@ class CurveControlDemo {
         const costSavings = result.costSavings || 0;
         const percentSavings = result.percentSavings || 0;
         const co2Avoided = result.co2Avoided || 0;
+        const carsEquivalent = result.carsEquivalent || 0;
 
         // Display savings as returned by backend (already calculated for appropriate period)
         document.getElementById('cost-savings').textContent = `$${costSavings.toLocaleString()}`;
         document.getElementById('percent-savings').textContent = `${percentSavings}%`;
         document.getElementById('co2-savings').textContent = `${co2Avoided.toFixed(2)}`;
+        document.getElementById('cars-equivalent').textContent = `${carsEquivalent.toFixed(2)}`;
 
         // Create temperature chart
         this.createTemperatureChart(result);
@@ -583,6 +593,39 @@ class CurveControlDemo {
         } else {
             this.calculateAdvancedOptimization();
         }
+    }
+
+    forceRefresh() {
+        // Clear any cached data and force fresh calculation
+        console.log('🔄 Force refreshing - clearing all cached data');
+
+        // Reset results display
+        document.getElementById('results-content').style.display = 'none';
+        document.getElementById('error-state').style.display = 'none';
+        document.getElementById('loading-indicator').style.display = 'none';
+
+        // Destroy existing chart
+        if (this.chart) {
+            this.chart.destroy();
+            this.chart = null;
+        }
+
+        // Add extra cache-busting parameters
+        const originalPerformOptimization = this.performOptimization.bind(this);
+        this.performOptimization = async function(data) {
+            data.forceRefresh = true;
+            data.cacheBuster = Math.random().toString(36).substring(7);
+            data.userAgent = navigator.userAgent.substring(0, 50);
+            return originalPerformOptimization(data);
+        };
+
+        // Retry the calculation
+        this.retryCalculation();
+
+        // Reset the method after this call
+        setTimeout(() => {
+            this.performOptimization = originalPerformOptimization;
+        }, 1000);
     }
 }
 

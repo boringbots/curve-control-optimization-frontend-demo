@@ -147,12 +147,53 @@
                                 <div class="savings-amount" id="co2-savings">0</div>
                                 <div class="savings-label">Tons CO₂ Avoided</div>
                             </div>
+                            <div class="savings-card">
+                                <div class="savings-amount" id="cars-equivalent">0</div>
+                                <div class="savings-label">Cars Off Road</div>
+                            </div>
                         </div>
 
                         <!-- Temperature Schedule Chart -->
                         <div class="chart-container">
                             <h4>Your Optimized Temperature Schedule</h4>
                             <canvas id="temperature-chart"></canvas>
+                        </div>
+
+                        <!-- Tips Grid -->
+                        <div class="tips-grid">
+                            <div class="tip-box">
+                                <div class="tip-icon">💡</div>
+                                <p>Higher optimization levels save more money but allow larger temperature swings.</p>
+                            </div>
+                            <div class="tip-box">
+                                <div class="tip-icon">🏠</div>
+                                <p>Larger homes typically see greater absolute savings but similar percentage savings.</p>
+                            </div>
+                            <div class="tip-box">
+                                <div class="tip-icon">⏰</div>
+                                <p>Longer away periods allow more aggressive optimization for greater savings.</p>
+                            </div>
+                            <div class="tip-box">
+                                <div class="tip-icon">🌡️</div>
+                                <p>The system maintains comfort while shifting energy use to cheaper time periods.</p>
+                            </div>
+                            <div class="tip-box">
+                                <div class="tip-icon">🏡</div>
+                                <h5>Deploy now through your Home Assistant</h5>
+                                <p>Custom integration and dashboard card are available here:</p>
+                                <div class="tip-links">
+                                    <a href="https://github.com/boringbots/curve-control-ha-integration" target="_blank">Integration →</a>
+                                    <a href="https://github.com/boringbots/curve-control-card" target="_blank">Card →</a>
+                                </div>
+                            </div>
+                            <div class="tip-box">
+                                <div class="tip-icon">🔧</div>
+                                <h5>Ready to start saving?</h5>
+                                <p>Get the full Home Assistant setup to automatically control your HVAC system.</p>
+                                <div class="tip-links">
+                                    <a href="https://github.com/boringbots/curve-control-ha-integration" target="_blank">Get Started →</a>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Call to Action -->
@@ -173,6 +214,7 @@
                         <h4>⚠️ Unable to Calculate Results</h4>
                         <p id="error-message">Please check your settings and try again.</p>
                         <button class="btn-secondary" id="retry-calculation">Retry</button>
+                        <button class="btn-secondary" id="force-refresh">Force New Calculation</button>
                     </div>
                 </div>
             </div>

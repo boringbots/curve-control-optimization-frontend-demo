@@ -372,6 +372,63 @@ small {
     position: relative;
 }
 
+/* Tips Grid */
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.tip-box {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.tip-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.tip-box p {
+    margin: 0.5rem 0;
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.tip-box h5 {
+    margin: 0.5rem 0;
+    color: #333;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.tip-links {
+    margin-top: 0.75rem;
+}
+
+.tip-links a {
+    display: inline-block;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.tip-links a:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    text-decoration: none;
+}
+
 .chart-container h4 {
     margin-bottom: 1rem;
     color: #333;
@@ -518,6 +575,11 @@ footer {
 
     .savings-summary {
         grid-template-columns: 1fr;
+    }
+
+    .tips-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
     }
 
     .savings-amount {
