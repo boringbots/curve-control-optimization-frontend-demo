@@ -383,109 +383,113 @@ class CurveControlDemo {
             return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         });
 
-        const options = {
-            series: [
-                {
-                    name: 'Optimized Temperature',
-                    type: 'line',
-                    data: optimizedTemps,
-                    color: '#667eea'
-                },
-                {
-                    name: 'High Limit',
-                    type: 'line',
-                    data: highBounds,
-                    color: '#ff6b6b'
-                },
-                {
-                    name: 'Low Limit',
-                    type: 'line',
-                    data: lowBounds,
-                    color: '#4ecdc4'
-                },
-                {
-                    name: 'Electricity Price',
-                    type: 'area',
-                    yAxisIndex: 1,
-                    data: prices,
-                    color: '#feca57'
-                }
-            ],
-            chart: {
-                height: 400,
-                type: 'line',
-                toolbar: {
-                    show: false
-                }
-            },
-            stroke: {
-                width: [3, 2, 2, 2],
-                dashArray: [0, 5, 5, 0]
-            },
-            fill: {
-                opacity: [1, 0.8, 0.8, 0.3]
-            },
-            xaxis: {
-                categories: timeLabels,
-                title: {
-                    text: 'Time of Day'
-                },
-                labels: {
-                    rotate: -45,
-                    formatter: function(value, timestamp, opts) {
-                        // Show only every 4th label to avoid crowding
-                        return opts.dataPointIndex % 4 === 0 ? value : '';
-                    }
-                }
-            },
-            yaxis: [
-                {
-                    title: {
-                        text: 'Temperature (°F)'
+        // Find min/max for temperature axis
+        const allTemps = [...optimizedTemps, ...highBounds, ...lowBounds];
+        const minTemp = Math.floor(Math.min(...allTemps) - 2);
+        const maxTemp = Math.ceil(Math.max(...allTemps) + 2);
+        const maxPrice = Math.ceil(Math.max(...prices) * 1.1 * 100) / 100;
+
+        const config = {
+            type: 'line',
+            data: {
+                labels: timeLabels.filter((_, i) => i % 4 === 0), // Show every 4th label
+                datasets: [
+                    {
+                        label: 'Optimized Temperature',
+                        data: optimizedTemps.filter((_, i) => i % 4 === 0),
+                        borderColor: '#667eea',
+                        backgroundColor: '#667eea',
+                        borderWidth: 3,
+                        fill: false,
+                        yAxisID: 'y'
                     },
-                    min: function(min) {
-                        return Math.floor(min - 2);
+                    {
+                        label: 'High Limit',
+                        data: highBounds.filter((_, i) => i % 4 === 0),
+                        borderColor: '#ff6b6b',
+                        backgroundColor: '#ff6b6b',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        yAxisID: 'y'
                     },
-                    max: function(max) {
-                        return Math.ceil(max + 2);
-                    }
-                },
-                {
-                    opposite: true,
-                    title: {
-                        text: 'Electricity Price ($/kWh)'
+                    {
+                        label: 'Low Limit',
+                        data: lowBounds.filter((_, i) => i % 4 === 0),
+                        borderColor: '#4ecdc4',
+                        backgroundColor: '#4ecdc4',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        yAxisID: 'y'
                     },
-                    min: 0,
-                    max: function(max) {
-                        // Dynamic max based on actual price data
-                        return Math.ceil(max * 1.1 * 100) / 100; // Add 10% padding, round to 2 decimals
+                    {
+                        label: 'Electricity Price',
+                        data: prices.filter((_, i) => i % 4 === 0),
+                        borderColor: '#feca57',
+                        backgroundColor: 'rgba(254, 202, 87, 0.3)',
+                        borderWidth: 2,
+                        fill: true,
+                        yAxisID: 'y1'
                     }
-                }
-            ],
-            legend: {
-                position: 'bottom',
-                offsetY: 10
+                ]
             },
-            tooltip: {
-                shared: true,
-                intersect: false,
-                y: {
-                    formatter: function(value, { seriesIndex }) {
-                        if (seriesIndex === 3) {
-                            return '$' + value.toFixed(3) + '/kWh';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time of Day'
                         }
-                        return value.toFixed(1) + '°F';
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Temperature (°F)'
+                        },
+                        min: minTemp,
+                        max: maxTemp
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Price ($/kWh)'
+                        },
+                        min: 0,
+                        max: maxPrice,
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (context.dataset.label === 'Electricity Price') {
+                                    return context.dataset.label + ': $' + context.parsed.y.toFixed(3) + '/kWh';
+                                }
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '°F';
+                            }
+                        }
                     }
                 }
-            },
-            grid: {
-                borderColor: '#e9ecef',
-                strokeDashArray: 4
             }
         };
 
-        this.chart = new ApexCharts(document.querySelector("#temperature-chart"), options);
-        this.chart.render();
+        const canvas = document.getElementById('temperature-chart');
+        this.chart = new Chart(canvas, config);
     }
 
     generateSamplePrices(length) {
