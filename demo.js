@@ -348,12 +348,10 @@ class CurveControlDemo {
         const percentSavings = result.percentSavings || 0;
         const co2Avoided = result.co2Avoided || 0;
 
-        // Annualize the savings (assuming daily savings)
-        const annualSavings = Math.round(costSavings * 365);
-        
-        document.getElementById('cost-savings').textContent = `$${annualSavings.toLocaleString()}`;
+        // Display savings as returned by backend (already calculated for appropriate period)
+        document.getElementById('cost-savings').textContent = `$${costSavings.toLocaleString()}`;
         document.getElementById('percent-savings').textContent = `${percentSavings}%`;
-        document.getElementById('co2-savings').textContent = `${(co2Avoided * 365).toFixed(1)}`;
+        document.getElementById('co2-savings').textContent = `${co2Avoided.toFixed(2)}`;
 
         // Create temperature chart
         this.createTemperatureChart(result);
@@ -366,7 +364,7 @@ class CurveControlDemo {
         }
 
         const hourlyTemp = result.HourlyTemperature || [];
-        if (hourlyTemp.length < 4) {
+        if (hourlyTemp.length < 3) {
             console.error('Invalid chart data:', result);
             return;
         }
@@ -374,7 +372,8 @@ class CurveControlDemo {
         const intervals = hourlyTemp[0] || [];
         const highBounds = hourlyTemp[1] || [];
         const lowBounds = hourlyTemp[2] || [];
-        const prices = hourlyTemp[3] || [];
+        // Generate sample price data since backend doesn't return it
+        const prices = this.generateSamplePrices(intervals.length);
         const optimizedTemps = result.bestTempActual || [];
 
         // Convert intervals to time labels
@@ -456,7 +455,11 @@ class CurveControlDemo {
                     title: {
                         text: 'Electricity Price ($/kWh)'
                     },
-                    min: 0
+                    min: 0,
+                    max: function(max) {
+                        // Dynamic max based on actual price data
+                        return Math.ceil(max * 1.1 * 100) / 100; // Add 10% padding, round to 2 decimals
+                    }
                 }
             ],
             legend: {
@@ -483,6 +486,70 @@ class CurveControlDemo {
 
         this.chart = new ApexCharts(document.querySelector("#temperature-chart"), options);
         this.chart.render();
+    }
+
+    generateSamplePrices(length) {
+        // Get the current location from form or use default
+        const locationSelect = document.getElementById('location');
+        const location = locationSelect ? parseInt(locationSelect.value) : 1;
+
+        return this.getLocationPrices(location);
+    }
+
+    getLocationPrices(location) {
+        // Real retail prices by location (cents per kWh converted to dollars per kWh)
+        const priceData = {
+            1: [24.7, 24.7, 24.7, 24.7, 24.7, 24.7, 24.7, 24.7, 24.7, 24.7, 24.7, 24.7,
+                36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8,
+                36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8, 59.7, 59.7, 59.7, 59.7,
+                59.7, 59.7, 59.7, 59.7, 59.7, 59.7, 36.8, 36.8, 36.8, 36.8, 36.8, 36.8],
+
+            2: [31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6,
+                31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6,
+                31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6, 60.3, 60.3, 60.3, 60.3,
+                60.3, 60.3, 60.3, 60.3, 60.3, 60.3, 31.6, 31.6, 31.6, 31.6, 31.6, 31.6],
+
+            3: [27.9, 27.9, 27.9, 27.9, 27.9, 27.9, 27.9, 27.9, 27.9, 27.9, 27.9, 27.9,
+                39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3,
+                39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3, 47.6, 47.6, 47.6, 47.6,
+                47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 39.3, 39.3, 39.3, 39.3, 39.3, 39.3],
+
+            4: [31.72222222, 31.72222222, 31.72222222, 31.72222222, 31.72222222, 31.72222222,
+                31.72222222, 31.72222222, 31.72222222, 31.72222222, 31.72222222, 31.72222222,
+                35.32222222, 35.32222222, 35.32222222, 35.32222222, 35.32222222, 35.32222222,
+                35.32222222, 35.32222222, 35.32222222, 35.32222222, 35.32222222, 35.32222222,
+                35.32222222, 35.32222222, 35.32222222, 35.32222222, 35.32222222, 35.32222222,
+                35.32222222, 35.32222222, 62.32222222, 62.32222222, 62.32222222, 62.32222222,
+                62.32222222, 62.32222222, 62.32222222, 62.32222222, 62.32222222, 62.32222222,
+                35.32222222, 35.32222222, 35.32222222, 35.32222222, 35.32222222, 35.32222222],
+
+            5: [40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4,
+                40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4,
+                40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4,
+                40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4, 40.4],
+
+            6: [8.384777778, 8.384777778, 8.384777778, 8.384777778, 8.384777778, 8.384777778,
+                8.384777778, 8.384777778, 8.384777778, 8.384777778, 8.384777778, 8.384777778,
+                12.09077778, 12.09077778, 12.09077778, 12.09077778, 12.09077778, 12.09077778,
+                12.09077778, 12.09077778, 12.09077778, 12.09077778, 12.09077778, 12.09077778,
+                12.09077778, 12.09077778, 12.09077778, 12.09077778, 12.09077778, 12.09077778,
+                24.25577778, 24.25577778, 24.25577778, 24.25577778, 24.25577778, 24.25577778,
+                24.25577778, 24.25577778, 24.25577778, 24.25577778, 8.384777778, 8.384777778,
+                8.384777778, 8.384777778, 8.384777778, 8.384777778, 8.384777778, 8.384777778],
+
+            7: [9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333,
+                9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333,
+                9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333,
+                9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333,
+                9.375933333, 9.375933333, 26.10743333, 26.10743333, 26.10743333, 26.10743333,
+                26.10743333, 26.10743333, 26.10743333, 26.10743333, 26.10743333, 26.10743333,
+                26.10743333, 26.10743333, 9.375933333, 9.375933333, 9.375933333, 9.375933333,
+                9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333, 9.375933333]
+        };
+
+        // Get price data for location, convert cents to dollars
+        const centsPerKwh = priceData[location] || priceData[1]; // Default to location 1
+        return centsPerKwh.map(cents => parseFloat((cents / 100).toFixed(4))); // Convert cents to dollars
     }
 
     retryCalculation() {
